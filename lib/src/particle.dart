@@ -11,6 +11,14 @@ class Range {
   Range({required this.first, required this.second});
 }
 
+class RangeValue {
+  Range originalRange;
+  double randomValueFromRange;
+
+  RangeValue({required this.originalRange})
+      : randomValueFromRange = doubleInRange(originalRange);
+}
+
 /*
  A class representing a single particle in a particle system.
  It holds information about the particle's position, velocity, opacity, lifetime, and its image.
@@ -37,19 +45,13 @@ Coordinates of a screen (x,y)
     |                          |
   (0,1)______________________(1,1)
  */
-class RangeValue {
-  Range originalRange;
-  double randomValueFromRange;
-
-  RangeValue({required this.originalRange})
-      : randomValueFromRange = doubleInRange(originalRange);
-}
 
 class Particle {
   RangeValue x;
   RangeValue y;
   RangeValue vx;
   RangeValue vy;
+  RangeValue imageSize;
   double opacity;
   double opacityChangeSpeed;
   Duration lifeTime;
@@ -65,6 +67,7 @@ class Particle {
     Range? rangeY,
     Range? rangeVx,
     Range? rangeVy,
+    Range? rangeImageSize,
     double? opacity,
     double? opacityChangeSpeed,
     Duration? lifeTimee,
@@ -75,10 +78,14 @@ class Particle {
             originalRange: rangeVx ?? Range(first: -0.5, second: 0.5)),
         vy = RangeValue(
             originalRange: rangeVy ?? Range(first: -0.5, second: 0.5)),
+        imageSize = RangeValue(
+            originalRange: rangeImageSize ?? Range(first: 1, second: 1)),
         opacity = opacity ?? 255,
         opacityChangeSpeed = opacityChangeSpeed ?? 0,
         lifeTime = lifeTimee ?? Duration(seconds: 3) {
-    loadImageFromAssets(particleImageAssetPath).then((image) {
+    loadImageFromAssets(particleImageAssetPath,
+            scale: imageSize.randomValueFromRange)
+        .then((image) {
       particleImage = image;
     });
     _lifeTimer = Timer(Duration(milliseconds: lifeTime.inMilliseconds), () {
@@ -96,6 +103,9 @@ class Particle {
           Range(first: vx.originalRange.first, second: vx.originalRange.second),
       rangeVy:
           Range(first: vy.originalRange.first, second: vy.originalRange.second),
+      rangeImageSize: Range(
+          first: imageSize.originalRange.first,
+          second: imageSize.originalRange.second),
       opacity: opacity,
       opacityChangeSpeed: opacityChangeSpeed,
       lifeTimee: lifeTime,
@@ -133,13 +143,34 @@ double doubleInRange(Range range) {
   return range.first + (range.second - range.first) * random.nextDouble();
 }
 
-// Load image from assets asynchronously
-Future<ui.Image> loadImageFromAssets(String path) async {
+Future<ui.Image> loadImageFromAssets(String path, {double scale = 1.0}) async {
   final ByteData data = await rootBundle.load(path);
   final Uint8List list = data.buffer.asUint8List();
   final Completer<ui.Image> completer = Completer();
-  ui.decodeImageFromList(list, (ui.Image img) {
-    completer.complete(img);
+
+  ui.decodeImageFromList(list, (ui.Image img) async {
+    ui.Image resizedImage = await resizeImage(
+        img, (img.width * scale).toInt(), (img.height * scale).toInt());
+    completer.complete(resizedImage);
   });
+
   return completer.future;
+}
+
+Future<ui.Image> resizeImage(
+    ui.Image image, int targetWidth, int targetHeight) async {
+  final ui.PictureRecorder recorder = ui.PictureRecorder();
+  final ui.Canvas canvas = ui.Canvas(recorder);
+
+  final ui.Paint paint = ui.Paint()..filterQuality = ui.FilterQuality.high;
+
+  canvas.drawImageRect(
+    image,
+    Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+    Rect.fromLTWH(0, 0, targetWidth.toDouble(), targetHeight.toDouble()),
+    paint,
+  );
+
+  final ui.Picture picture = recorder.endRecording();
+  return await picture.toImage(targetWidth, targetHeight);
 }

@@ -36,9 +36,9 @@ class ParticleEffectPage extends StatelessWidget {
                 // rangeY: Range(first: 0.5, second: 0.5),
                 // rangeVx: Range(first: -0.3, second: 0.3),
                 // rangeVy: Range(first: 0.0, second: 1),
+                rangeImageSize: Range(first: 0.1, second: 0.3),
                 // lifeTimee: Duration(seconds: 3),
-                particleImageAssetPath:
-                    'assets/particle.png', // Używaj assetu cząsteczek
+                particleImageAssetPath: 'assets/particle_big.png',
               ),
               //Particle(particleImageAssetPath: 'assets/particle_2.png')
             ],
