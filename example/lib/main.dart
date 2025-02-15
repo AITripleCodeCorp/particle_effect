@@ -27,21 +27,27 @@ class ParticleEffectPage extends StatelessWidget {
       ),
       body: Stack(
         children: [
+          ParticleEffect(
+            maxParticles: 50,
+            particleInterval: Duration(milliseconds: 200),
+            particles: [
+              Particle(
+                // rangeX: Range(first: 0.5, second: 0.5),
+                // rangeY: Range(first: 0.5, second: 0.5),
+                // rangeVx: Range(first: -0.3, second: 0.3),
+                // rangeVy: Range(first: 0.0, second: 1),
+                // lifeTimee: Duration(seconds: 3),
+                particleImageAssetPath:
+                    'assets/particle.png', // Używaj assetu cząsteczek
+              ),
+              //Particle(particleImageAssetPath: 'assets/particle_2.png')
+            ],
+          ),
           Center(
             child: Text(
               'Particle Effect Below!',
               style: TextStyle(fontSize: 24, color: Colors.black),
             ),
-          ),
-          ParticleEffect(
-            maxParticles: 30,
-            particleInterval: Duration(milliseconds: 200),
-            particles: [
-              Particle(
-                particleImageAssetPath:
-                    'assets/particle.png', // Używaj assetu cząsteczek
-              ),
-            ],
           ),
         ],
       ),

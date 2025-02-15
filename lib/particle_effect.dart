@@ -60,7 +60,7 @@ class _ParticleEffectState extends State<ParticleEffect>
     Particle particle =
         widget.particles[Random().nextInt(widget.particles.length)];
     // Musze jakoś zrobić kopie tego particla kurwencko.
-    return particle;
+    return particle.clone();
   }
 
   @override

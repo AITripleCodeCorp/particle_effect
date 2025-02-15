@@ -11,19 +11,21 @@ class ParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (var particle in particles) {
-      particle.setPosition(particle.x * size.width, particle.y * size.height);
+      if (particle.particleImage == null) continue;
+
+      particle.setPosition(particle.x.randomValueFromRange * size.width,
+          particle.y.randomValueFromRange * size.height);
 
       particle.update();
       var paint = Paint()
         ..color = Color.fromARGB(particle.opacity.toInt(), 255, 255, 255);
 
-      if (particle.particleImage != null) {
-        canvas.drawImage(
-          particle.particleImage!,
-          Offset(particle.x, particle.y),
-          paint,
-        );
-      }
+      canvas.drawImage(
+        particle.particleImage!,
+        Offset(
+            particle.x.randomValueFromRange, particle.y.randomValueFromRange),
+        paint,
+      );
     }
   }
 

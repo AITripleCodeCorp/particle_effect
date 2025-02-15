@@ -5,12 +5,13 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-class Pair {
+class Range {
   double first;
   double second;
 
-  Pair({required this.first, required this.second});
+  Range({required this.first, required this.second});
 }
+
 /*
  A class representing a single particle in a particle system.
  It holds information about the particle's position, velocity, opacity, lifetime, and its image.
@@ -37,36 +38,44 @@ Coordinates of a screen (x,y)
     |                          |
   (0,1)______________________(1,1)
  */
+class RangeValue {
+  Range originalRange;
+  double randomValueFromRange;
+
+  RangeValue({required this.originalRange})
+      : randomValueFromRange = doubleInRange(originalRange);
+}
 
 class Particle {
-  double x;
-  double y;
-  double vx;
-  double vy;
+  RangeValue x;
+  RangeValue y;
+  RangeValue vx;
+  RangeValue vy;
   double opacity;
   double opacityChangeSpeed;
   Duration lifeTime;
-  ui.Image? particleImage; // Make it nullable for async loading
+  ui.Image? particleImage;
   String particleImageAssetPath;
   Timer? _lifeTimer;
 
   bool _isPosSetted = false;
   bool _shouldDispose = false;
 
-  // Constructor updated to accept a future for the image
   Particle({
-    Pair? rangeX,
-    Pair? rangeY,
-    Pair? rangeVx,
-    Pair? rangeVy,
+    Range? rangeX,
+    Range? rangeY,
+    Range? rangeVx,
+    Range? rangeVy,
     double? opacity,
     double? opacityChangeSpeed,
     Duration? lifeTimee,
     required this.particleImageAssetPath,
-  })  : x = doubleInRange(rangeX ?? Pair(first: 0, second: 1)),
-        y = doubleInRange(rangeY ?? Pair(first: 0, second: 1)),
-        vx = doubleInRange(rangeVx ?? Pair(first: -0.5, second: 0.5)),
-        vy = doubleInRange(rangeVy ?? Pair(first: -0.5, second: 0.5)),
+  })  : x = RangeValue(originalRange: rangeX ?? Range(first: 0, second: 1)),
+        y = RangeValue(originalRange: rangeY ?? Range(first: 0, second: 1)),
+        vx = RangeValue(
+            originalRange: rangeVx ?? Range(first: -0.5, second: 0.5)),
+        vy = RangeValue(
+            originalRange: rangeVy ?? Range(first: -0.5, second: 0.5)),
         opacity = opacity ?? 255,
         opacityChangeSpeed = opacityChangeSpeed ?? 0,
         lifeTime = lifeTimee ?? Duration(seconds: 3) {
@@ -78,36 +87,49 @@ class Particle {
     });
   }
 
-  // Update method to handle particle movement and fading
+  Particle clone() {
+    return Particle(
+      rangeX:
+          Range(first: x.originalRange.first, second: x.originalRange.second),
+      rangeY:
+          Range(first: y.originalRange.first, second: y.originalRange.second),
+      rangeVx:
+          Range(first: vx.originalRange.first, second: vx.originalRange.second),
+      rangeVy:
+          Range(first: vy.originalRange.first, second: vy.originalRange.second),
+      opacity: opacity,
+      opacityChangeSpeed: opacityChangeSpeed,
+      lifeTimee: lifeTime,
+      particleImageAssetPath: particleImageAssetPath,
+    );
+  }
+
   void update() {
-    x += vx;
-    y += vy;
+    x.randomValueFromRange += vx.randomValueFromRange;
+    y.randomValueFromRange += vy.randomValueFromRange;
     opacity -= opacityChangeSpeed;
     if (_shouldDispose) opacityChangeSpeed += 2;
   }
 
-  // Set position only once for the particle
   setPosition(double xPos, double yPos) {
     if (!_isPosSetted) {
-      x = xPos;
-      y = yPos;
+      x.randomValueFromRange = xPos;
+      y.randomValueFromRange = yPos;
       _isPosSetted = true;
     }
   }
 
-  // Check if particle is finished (based on opacity or lifetime)
   bool isFinished() {
     return opacity <= 0 || opacity > 255;
   }
 
-  // Dispose timer when done
   void dispose() {
     _lifeTimer?.cancel();
   }
 }
 
 // Helper function to get a random value in the specified range
-double doubleInRange(Pair range) {
+double doubleInRange(Range range) {
   var random = Random();
   return range.first + (range.second - range.first) * random.nextDouble();
 }
