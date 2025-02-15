@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:particle_effect/particle_effect.dart'; // Importujemy Twój pakiet
+import 'package:particle_effect/particle_effect.dart';
 
 void main() {
   runApp(MyApp());
