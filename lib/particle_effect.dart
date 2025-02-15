@@ -3,8 +3,6 @@ library particle_effect;
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flutter/scheduler.dart';
-
-// Poprawione importy:
 import 'src/particle.dart';
 import 'src/particle_painter.dart';
 
@@ -59,7 +57,6 @@ class _ParticleEffectState extends State<ParticleEffect>
     assert(widget.particles.isNotEmpty);
     Particle particle =
         widget.particles[Random().nextInt(widget.particles.length)];
-    // Musze jakoś zrobić kopie tego particla kurwencko.
     return particle.clone();
   }
 

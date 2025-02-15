@@ -16,6 +16,4 @@ To use this package in your Flutter project, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  particle_effect_package:
-    git:
-      url: git://github.com/AITripleCodeCorp/particle_effect.git
+  particle_effect: ^1.0.1

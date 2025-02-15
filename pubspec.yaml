@@ -1,6 +1,6 @@
 name: particle_effect
 description: A Flutter package for creating dynamic particle effects with configurable ranges and random movement.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/AITripleCodeCorp/particle_effect
 
 environment:
