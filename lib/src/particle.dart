@@ -35,7 +35,9 @@ class Range {
   double first;
   double second;
 
-  Range({required this.first, required this.second});
+  Range({required this.first, required this.second}) {
+    assert(first <= second, 'First must be greater than or equal to second');
+  }
 }
 
 class RangeValue {
@@ -52,8 +54,8 @@ class Particle {
   RangeValue vx;
   RangeValue vy;
   RangeValue imageSize;
-  double rotation;
-  double rotationSpeed;
+  RangeValue rotation;
+  RangeValue rotationSpeed;
   double opacity;
   double opacityChangeSpeed;
   Duration lifeTime;
@@ -73,8 +75,8 @@ class Particle {
     double? opacity,
     double? opacityChangeSpeed,
     Duration? lifeTimee,
-    double? rotation,
-    double? rotationSpeed,
+    Range? rotation,
+    Range? rotationSpeed,
     required this.particleImageAssetPath,
   })  : x = RangeValue(originalRange: rangeX ?? Range(first: 0, second: 1)),
         y = RangeValue(originalRange: rangeY ?? Range(first: 0, second: 1)),
@@ -87,8 +89,10 @@ class Particle {
         opacity = opacity ?? 255,
         opacityChangeSpeed = opacityChangeSpeed ?? 0,
         lifeTime = lifeTimee ?? Duration(seconds: 3),
-        rotation = rotation ?? 1,
-        rotationSpeed = rotationSpeed ?? 1 {
+        rotation =
+            RangeValue(originalRange: rotation ?? Range(first: 0, second: 0)),
+        rotationSpeed = RangeValue(
+            originalRange: rotationSpeed ?? Range(first: 0, second: 0)) {
     loadImageFromAssets(particleImageAssetPath,
             scale: imageSize.randomValueFromRange)
         .then((image) {
@@ -109,14 +113,18 @@ class Particle {
           Range(first: vx.originalRange.first, second: vx.originalRange.second),
       rangeVy:
           Range(first: vy.originalRange.first, second: vy.originalRange.second),
+      rotation: Range(
+          first: rotation.originalRange.first,
+          second: rotation.originalRange.second),
+      rotationSpeed: Range(
+          first: rotationSpeed.originalRange.first,
+          second: rotationSpeed.originalRange.second),
       rangeImageSize: Range(
           first: imageSize.originalRange.first,
           second: imageSize.originalRange.second),
       opacity: opacity,
       opacityChangeSpeed: opacityChangeSpeed,
       lifeTimee: lifeTime,
-      rotation: rotation,
-      rotationSpeed: rotationSpeed,
       particleImageAssetPath: particleImageAssetPath,
     );
   }
@@ -124,14 +132,13 @@ class Particle {
   void update() {
     x.randomValueFromRange += vx.randomValueFromRange;
     y.randomValueFromRange += vy.randomValueFromRange;
-    rotation += rotationSpeed;
+    rotation.randomValueFromRange += rotationSpeed.randomValueFromRange;
     opacity -= opacityChangeSpeed;
 
     //When their life time is over make dissapear faster
     if (_shouldDispose) opacity -= 2;
-    if (opacity < 0) opacity = 0;
+    opacity = opacity.clamp(0, 255);
   }
-
 
   void setToDispose() {
     _shouldDispose = true;

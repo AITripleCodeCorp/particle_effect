@@ -38,35 +38,29 @@ class _ParticleEffectPageState extends State<ParticleEffectPage> {
             particleInterval: Duration(milliseconds: 500),
             particles: [
               Particle(
-                rangeX: Range(first: 0.5, second: 0.5),
-                rangeY: Range(first: 0.5, second: 0.5),
-                rangeVx: Range(first: 0, second: 0),
-                rangeVy: Range(first: 0, second: 0),
+                rangeX: Range(first: 0, second: 1),
+                rangeY: Range(first: 0, second: 1),
+                rangeVx: Range(first: -0.5, second: 0.5),
+                rangeVy: Range(first: -0.5, second: 0.5),
+                rotation: Range(first: -360, second: 360),
+                rotationSpeed: Range(first: -1, second: 1),
                 rangeImageSize: Range(first: 0.1, second: 0.3),
-                lifeTimee: Duration(seconds: 3),
+                lifeTimee: Duration(seconds: 10),
                 particleImageAssetPath: 'assets/particle_big.png',
               ),
-              //Particle(particleImageAssetPath: 'assets/particle.png')
             ],
           ),
-          ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  maxParticles == 0 ? maxParticles = 20 : maxParticles = 0;
-                });
-              },
-              child: Text("Kill all Particles"))
-          //Center(
-          // child: Container(
-          //   height: 150,
-          //   width: 150,
-          //   color: Colors.blue,
-          //   child: Text(
-          //     'Particle Effect Below!',
-          //     style: TextStyle(fontSize: 24, color: Colors.black),
-          //   ),
-          // ),
-          // ),
+          Center(
+            child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    maxParticles == 0 ? maxParticles = 20 : maxParticles = 0;
+                  });
+                },
+                child: Text(maxParticles == 20
+                    ? "Kill all Particles"
+                    : "Revive Particles")),
+          )
         ],
       ),
     );

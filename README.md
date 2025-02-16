@@ -16,4 +16,4 @@ To use this package in your Flutter project, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  particle_effect: ^1.0.1
+  particle_effect: [LATEST_VERSION]

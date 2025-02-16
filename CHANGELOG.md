@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.3]
+  **2025-02-16**
+- Support for random particle rotation.
+- Improved particle disappearance logic using opacity fading.
+
 ## [1.0.2]
   **2025-02-15**
 - Support for random particle size.
