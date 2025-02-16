@@ -18,7 +18,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ParticleEffectPage extends StatelessWidget {
+class ParticleEffectPage extends StatefulWidget {
+  @override
+  State<ParticleEffectPage> createState() => _ParticleEffectPageState();
+}
+
+class _ParticleEffectPageState extends State<ParticleEffectPage> {
+  int maxParticles = 20;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,27 +34,39 @@ class ParticleEffectPage extends StatelessWidget {
       body: Stack(
         children: [
           ParticleEffect(
-            maxParticles: 50,
-            particleInterval: Duration(milliseconds: 200),
+            maxParticles: maxParticles,
+            particleInterval: Duration(milliseconds: 500),
             particles: [
               Particle(
-                // rangeX: Range(first: 0.5, second: 0.5),
-                // rangeY: Range(first: 0.5, second: 0.5),
-                // rangeVx: Range(first: -0.3, second: 0.3),
-                // rangeVy: Range(first: 0.0, second: 1),
+                rangeX: Range(first: 0.5, second: 0.5),
+                rangeY: Range(first: 0.5, second: 0.5),
+                rangeVx: Range(first: 0, second: 0),
+                rangeVy: Range(first: 0, second: 0),
                 rangeImageSize: Range(first: 0.1, second: 0.3),
-                // lifeTimee: Duration(seconds: 3),
+                lifeTimee: Duration(seconds: 3),
                 particleImageAssetPath: 'assets/particle_big.png',
               ),
-              //Particle(particleImageAssetPath: 'assets/particle_2.png')
+              //Particle(particleImageAssetPath: 'assets/particle.png')
             ],
           ),
-          Center(
-            child: Text(
-              'Particle Effect Below!',
-              style: TextStyle(fontSize: 24, color: Colors.black),
-            ),
-          ),
+          ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  maxParticles == 0 ? maxParticles = 20 : maxParticles = 0;
+                });
+              },
+              child: Text("Kill all Particles"))
+          //Center(
+          // child: Container(
+          //   height: 150,
+          //   width: 150,
+          //   color: Colors.blue,
+          //   child: Text(
+          //     'Particle Effect Below!',
+          //     style: TextStyle(fontSize: 24, color: Colors.black),
+          //   ),
+          // ),
+          // ),
         ],
       ),
     );

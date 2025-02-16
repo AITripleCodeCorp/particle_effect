@@ -37,9 +37,15 @@ class _ParticleEffectState extends State<ParticleEffect>
     startTicker();
   }
 
+  void onMaxParticlesChanged() {
+    if (widget.maxParticles == 0)
+      particlesOnScreen.forEach((particle) => particle.setToDispose());
+  }
+
   void startTicker() {
     Duration lastParticleTime = Duration.zero;
     _ticker = createTicker((elapsed) {
+      onMaxParticlesChanged();
       if (particlesOnScreen.length < widget.maxParticles &&
           elapsed - lastParticleTime >= widget.particleInterval) {
         particlesOnScreen.add(creatParticle());

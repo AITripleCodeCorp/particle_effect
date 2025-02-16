@@ -1,24 +1,3 @@
-import 'dart:math';
-import 'dart:ui' as ui;
-import 'dart:async';
-
-import 'package:flutter/services.dart';
-
-class Range {
-  double first;
-  double second;
-
-  Range({required this.first, required this.second});
-}
-
-class RangeValue {
-  Range originalRange;
-  double randomValueFromRange;
-
-  RangeValue({required this.originalRange})
-      : randomValueFromRange = doubleInRange(originalRange);
-}
-
 /*
  A class representing a single particle in a particle system.
  It holds information about the particle's position, velocity, opacity, lifetime, and its image.
@@ -46,12 +25,35 @@ Coordinates of a screen (x,y)
   (0,1)______________________(1,1)
  */
 
+import 'dart:math';
+import 'dart:ui' as ui;
+import 'dart:async';
+
+import 'package:flutter/services.dart';
+
+class Range {
+  double first;
+  double second;
+
+  Range({required this.first, required this.second});
+}
+
+class RangeValue {
+  Range originalRange;
+  double randomValueFromRange;
+
+  RangeValue({required this.originalRange})
+      : randomValueFromRange = doubleInRange(originalRange);
+}
+
 class Particle {
   RangeValue x;
   RangeValue y;
   RangeValue vx;
   RangeValue vy;
   RangeValue imageSize;
+  double rotation;
+  double rotationSpeed;
   double opacity;
   double opacityChangeSpeed;
   Duration lifeTime;
@@ -71,6 +73,8 @@ class Particle {
     double? opacity,
     double? opacityChangeSpeed,
     Duration? lifeTimee,
+    double? rotation,
+    double? rotationSpeed,
     required this.particleImageAssetPath,
   })  : x = RangeValue(originalRange: rangeX ?? Range(first: 0, second: 1)),
         y = RangeValue(originalRange: rangeY ?? Range(first: 0, second: 1)),
@@ -82,7 +86,9 @@ class Particle {
             originalRange: rangeImageSize ?? Range(first: 1, second: 1)),
         opacity = opacity ?? 255,
         opacityChangeSpeed = opacityChangeSpeed ?? 0,
-        lifeTime = lifeTimee ?? Duration(seconds: 3) {
+        lifeTime = lifeTimee ?? Duration(seconds: 3),
+        rotation = rotation ?? 1,
+        rotationSpeed = rotationSpeed ?? 1 {
     loadImageFromAssets(particleImageAssetPath,
             scale: imageSize.randomValueFromRange)
         .then((image) {
@@ -109,6 +115,8 @@ class Particle {
       opacity: opacity,
       opacityChangeSpeed: opacityChangeSpeed,
       lifeTimee: lifeTime,
+      rotation: rotation,
+      rotationSpeed: rotationSpeed,
       particleImageAssetPath: particleImageAssetPath,
     );
   }
@@ -116,8 +124,17 @@ class Particle {
   void update() {
     x.randomValueFromRange += vx.randomValueFromRange;
     y.randomValueFromRange += vy.randomValueFromRange;
+    rotation += rotationSpeed;
     opacity -= opacityChangeSpeed;
-    if (_shouldDispose) opacityChangeSpeed += 2;
+
+    //When their life time is over make dissapear faster
+    if (_shouldDispose) opacity -= 2;
+    if (opacity < 0) opacity = 0;
+  }
+
+
+  void setToDispose() {
+    _shouldDispose = true;
   }
 
   setPosition(double xPos, double yPos) {
