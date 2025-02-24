@@ -1,4 +1,5 @@
 # Particle Effect Package
+[text](https://pub.dev/packages/particle_effect)
 
 A simple yet powerful particle effect package for Flutter, designed to create particles with random movements, fading, and custom lifetimes. The package allows you to configure particle position, velocity, opacity, and more using customizable ranges.
 

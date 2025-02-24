@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4]
+  **2025-02-24**
+- Support for random particle rotation.
+- Improved particle disappearance logic using opacity fading.
+- Added `lifeTime` as a `Range` to randomize the lifetime of particles.
+- All particles now appear with fading effect by default.
+- The `interval` argument is no longer required for particle creation.
+
 ## [1.0.3]
   **2025-02-16**
 - Support for random particle rotation.

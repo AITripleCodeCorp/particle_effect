@@ -11,13 +11,13 @@ export 'src/particle_painter.dart';
 
 class ParticleEffect extends StatefulWidget {
   final int maxParticles;
-  final Duration particleInterval;
+  final Duration? particleInterval;
   final List<Particle> particles;
 
   const ParticleEffect({
     Key? key,
-    this.maxParticles = 20,
-    this.particleInterval = const Duration(milliseconds: 1000),
+    this.maxParticles = 100,
+    this.particleInterval,
     required this.particles,
   }) : super(key: key);
 
@@ -29,26 +29,33 @@ class _ParticleEffectState extends State<ParticleEffect>
     with SingleTickerProviderStateMixin {
   List<Particle> particlesOnScreen = [];
   late final Ticker _ticker;
+  Duration lastParticleTime = Duration.zero;
 
   @override
   void initState() {
     super.initState();
-
     startTicker();
   }
 
   void onMaxParticlesChanged() {
-    if (widget.maxParticles == 0)
-      particlesOnScreen.forEach((particle) => particle.setToDispose());
+    if (widget.maxParticles == 0) {
+      for (var particle in particlesOnScreen) {
+        particle.setToDispose();
+      }
+    }
   }
 
   void startTicker() {
-    Duration lastParticleTime = Duration.zero;
     _ticker = createTicker((elapsed) {
       onMaxParticlesChanged();
-      if (particlesOnScreen.length < widget.maxParticles &&
-          elapsed - lastParticleTime >= widget.particleInterval) {
-        particlesOnScreen.add(creatParticle());
+
+      if (widget.particleInterval == null) {
+        while (particlesOnScreen.length < widget.maxParticles) {
+          particlesOnScreen.add(createParticle());
+        }
+      } else if (particlesOnScreen.length < widget.maxParticles &&
+          elapsed - lastParticleTime >= widget.particleInterval!) {
+        particlesOnScreen.add(createParticle());
         lastParticleTime = elapsed;
       }
 
@@ -59,7 +66,7 @@ class _ParticleEffectState extends State<ParticleEffect>
     _ticker.start();
   }
 
-  Particle creatParticle() {
+  Particle createParticle() {
     assert(widget.particles.isNotEmpty);
     Particle particle =
         widget.particles[Random().nextInt(widget.particles.length)];

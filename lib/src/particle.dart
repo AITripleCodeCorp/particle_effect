@@ -56,15 +56,17 @@ class Particle {
   RangeValue imageSize;
   RangeValue rotation;
   RangeValue rotationSpeed;
-  double opacity;
+  double currentOpacity = 0.01;
+  RangeValue lifeTimeRange;
+  final double targetOpacity;
   double opacityChangeSpeed;
-  Duration lifeTime;
   ui.Image? particleImage;
   String particleImageAssetPath;
   Timer? _lifeTimer;
 
   bool _isPosSetted = false;
   bool _shouldDispose = false;
+  bool _isFadedIn = false;
 
   Particle({
     Range? rangeX,
@@ -72,9 +74,9 @@ class Particle {
     Range? rangeVx,
     Range? rangeVy,
     Range? rangeImageSize,
-    double? opacity,
+    double? targetOpacity,
     double? opacityChangeSpeed,
-    Duration? lifeTimee,
+    Range? lifeTime,
     Range? rotation,
     Range? rotationSpeed,
     required this.particleImageAssetPath,
@@ -86,9 +88,10 @@ class Particle {
             originalRange: rangeVy ?? Range(first: -0.5, second: 0.5)),
         imageSize = RangeValue(
             originalRange: rangeImageSize ?? Range(first: 1, second: 1)),
-        opacity = opacity ?? 255,
+        targetOpacity = targetOpacity ?? 255,
         opacityChangeSpeed = opacityChangeSpeed ?? 0,
-        lifeTime = lifeTimee ?? Duration(seconds: 3),
+        lifeTimeRange =
+            RangeValue(originalRange: lifeTime ?? Range(first: 1, second: 5)),
         rotation =
             RangeValue(originalRange: rotation ?? Range(first: 0, second: 0)),
         rotationSpeed = RangeValue(
@@ -98,34 +101,28 @@ class Particle {
         .then((image) {
       particleImage = image;
     });
-    _lifeTimer = Timer(Duration(milliseconds: lifeTime.inMilliseconds), () {
+    print((lifeTimeRange.randomValueFromRange * 1000).toInt().toString());
+    _lifeTimer = Timer(
+        Duration(
+            milliseconds: (lifeTimeRange.randomValueFromRange * 1000).toInt()),
+        () {
       _shouldDispose = true;
     });
   }
 
   Particle clone() {
     return Particle(
-      rangeX:
-          Range(first: x.originalRange.first, second: x.originalRange.second),
-      rangeY:
-          Range(first: y.originalRange.first, second: y.originalRange.second),
-      rangeVx:
-          Range(first: vx.originalRange.first, second: vx.originalRange.second),
-      rangeVy:
-          Range(first: vy.originalRange.first, second: vy.originalRange.second),
-      rotation: Range(
-          first: rotation.originalRange.first,
-          second: rotation.originalRange.second),
-      rotationSpeed: Range(
-          first: rotationSpeed.originalRange.first,
-          second: rotationSpeed.originalRange.second),
-      rangeImageSize: Range(
-          first: imageSize.originalRange.first,
-          second: imageSize.originalRange.second),
-      opacity: opacity,
+      rangeX: x.originalRange,
+      rangeY: y.originalRange,
+      rangeVx: vx.originalRange,
+      rangeVy: vy.originalRange,
+      rotation: rotation.originalRange,
+      rotationSpeed: rotationSpeed.originalRange,
+      rangeImageSize: imageSize.originalRange,
+      targetOpacity: targetOpacity,
       opacityChangeSpeed: opacityChangeSpeed,
-      lifeTimee: lifeTime,
       particleImageAssetPath: particleImageAssetPath,
+      lifeTime: lifeTimeRange.originalRange,
     );
   }
 
@@ -133,11 +130,22 @@ class Particle {
     x.randomValueFromRange += vx.randomValueFromRange;
     y.randomValueFromRange += vy.randomValueFromRange;
     rotation.randomValueFromRange += rotationSpeed.randomValueFromRange;
-    opacity -= opacityChangeSpeed;
+    updateOpacity();
+  }
 
-    //When their life time is over make dissapear faster
-    if (_shouldDispose) opacity -= 2;
-    opacity = opacity.clamp(0, 255);
+  void updateOpacity() {
+    const double fadeIncrement = 2;
+
+    if (_shouldDispose) {
+      currentOpacity = (currentOpacity - fadeIncrement).clamp(0, 255);
+    } else if (!_isFadedIn) {
+      currentOpacity = (currentOpacity + fadeIncrement).clamp(0, targetOpacity);
+      if (currentOpacity >= targetOpacity) {
+        _isFadedIn = true;
+      }
+    } else {
+      currentOpacity += opacityChangeSpeed;
+    }
   }
 
   void setToDispose() {
@@ -153,7 +161,7 @@ class Particle {
   }
 
   bool isFinished() {
-    return opacity <= 0 || opacity > 255;
+    return currentOpacity <= 0 || currentOpacity > 255;
   }
 
   void dispose() {

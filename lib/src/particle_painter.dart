@@ -20,17 +20,17 @@ class ParticlePainter extends CustomPainter {
       particle.update();
 
       var paint = Paint()
-        ..color = Color.fromARGB(particle.opacity.toInt(), 255, 255, 255);
+        ..color =
+            Color.fromARGB(particle.currentOpacity.toInt(), 255, 255, 255);
 
       canvas.save();
       canvas.translate(
           particle.x.randomValueFromRange, particle.y.randomValueFromRange);
       canvas.rotate(particle.rotation.randomValueFromRange * (pi / 180));
 
-      // Pobranie wymiarów obrazka
       final imageWidth = particle.particleImage!.width.toDouble();
       final imageHeight = particle.particleImage!.height.toDouble();
-      // Rysowanie obrazka przesuniętego o połowę szerokości i wysokości
+
       canvas.drawImage(
         particle.particleImage!,
         Offset(-imageWidth / 2, -imageHeight / 2),
