@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.5]
+  **2025-02-24**
+- fix print statement
+
 ## [1.0.4]
   **2025-02-24**
 - Support for random particle rotation.

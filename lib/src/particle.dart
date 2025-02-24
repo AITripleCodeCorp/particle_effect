@@ -101,7 +101,6 @@ class Particle {
         .then((image) {
       particleImage = image;
     });
-    print((lifeTimeRange.randomValueFromRange * 1000).toInt().toString());
     _lifeTimer = Timer(
         Duration(
             milliseconds: (lifeTimeRange.randomValueFromRange * 1000).toInt()),
