@@ -31,8 +31,8 @@ class _MainPageState extends State<MainPage> {
   Range rangeImageSize = Range(first: 0.1, second: 0.3);
   Range rotation = Range(first: -45, second: 45);
   Range rotationSpeed = Range(first: -0.1, second: 0.1);
+  Range lifeTime = Range(first: 1, second: 3);
   int maxParticles = 20;
-  int maxParticleLifeTime = 2;
 
   Widget createSliders() {
     return SafeArea(
@@ -45,12 +45,15 @@ class _MainPageState extends State<MainPage> {
                   Range(first: 1, second: 100), (value) {
                 setState(() => maxParticles = value.toInt());
               }),
-              sliderWidget(
-                  "Czas życia cząsteczki cząsteczek [s]",
-                  maxParticleLifeTime.toDouble(),
-                  Range(first: 1, second: 100), (value) {
-                setState(() => maxParticleLifeTime = value.toInt());
-              }),
+              rangeSliderWidget(
+                "Czas życia cząsteczki cząsteczek [s]: ${lifeTime.first.toStringAsFixed(2)} - ${lifeTime.second.toStringAsFixed(2)}",
+                lifeTime,
+                Range(first: 0, second: 100),
+                (value) {
+                  setState(() =>
+                      lifeTime = Range(first: value.start, second: value.end));
+                },
+              ),
               rangeSliderWidget(
                 "Zakres X: ${rangeX.first.toStringAsFixed(2)} - ${rangeX.second.toStringAsFixed(2)}",
                 rangeX,
@@ -163,7 +166,6 @@ class _MainPageState extends State<MainPage> {
         children: [
           ParticleEffect(
             maxParticles: maxParticles,
-            particleInterval: Duration(milliseconds: 100),
             particles: [
               Particle(
                 rangeX: rangeX,
@@ -173,10 +175,9 @@ class _MainPageState extends State<MainPage> {
                 rangeImageSize: rangeImageSize,
                 rotation: rotation,
                 rotationSpeed: rotationSpeed,
-                opacity: 255, //// Should be A range
-                lifeTimee:
-                    Duration(seconds: maxParticleLifeTime), // Should be A range
-                particleImageAssetPath: 'assets/particle_big.png',
+                targetOpacity: 255,
+                lifeTime: lifeTime,
+                particleImageAssetPath: 'assets/note.png',
               ),
             ],
           ),
